@@ -6,10 +6,7 @@ import "../token/ERC20/ERC20Detailed.sol";
 
 contract SimpleToken is Context, ERC20, ERC20Detailed {
 
-    /*
-     * ERC20Detailed의 생성자를 호출하여 토큰 이름, 심볼, 소수점 자릿수를 설정하고,
-     * _mint 함수를 사용하여 생성자에게 초기 토큰을 할당합니다.
-     */
+// 토큰 이름, 심볼, 소수점 자릿수를 설정하고, 생성자에게 초기 토큰을 할당합니다.
     constructor () public ERC20Detailed("BaekseokUniversityToken", "BUT", 0) {
         // 초기 토큰 공급량을 설정하고, _msgSender()에게 모든 토큰을 할당합니다.
         // 여기서는 10000개의 토큰을 생성하고, 소수점 자릿수는 0으로 설정합니다.
