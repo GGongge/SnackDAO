@@ -1,8 +1,5 @@
 pragma solidity ^0.8.13;
 
-/// 원래 Gnosis에서 작성되었으며 간단히 0.8 버전으로 업데이트되었습니다.
-/// @title 다중 서명 지갑 - 여러 당사자가 거래를 실행하기 전에 동의할 수 있도록 허용합니다.
-/// @author Stefan George - stefan.george@consensys.net
 contract MultiSigWallet {
     /*
     *  이벤트
@@ -17,14 +14,8 @@ contract MultiSigWallet {
     event OwnerRemoval(address indexed owner); // 소유자가 제거될 때 트리거되는 이벤트.
     event RequirementChange(uint required); // 필요한 확인 수가 변경될 때 트리거되는 이벤트.
 
-    /*
-    *  상수
-    */
     uint constant public MAX_OWNER_COUNT = 50; // 허용되는 최대 소유자 수.
 
-    /*
-    *  저장소
-    */
     mapping (uint => Transaction) public transactions; // 거래 ID와 거래 세부 정보를 매핑.
     mapping (uint => mapping (address => bool)) public confirmations; // 거래 ID와 소유자 주소 및 확인 상태를 매핑.
     mapping (address => bool) public isOwner; // 주소가 소유자인지 확인하는 매핑.
@@ -92,15 +83,13 @@ contract MultiSigWallet {
         _; // 소유자의 요구 사항이 유효하도록 보장합니다.
     }
 
-    /// @dev 폴백 함수는 이더 입금을 허용합니다.
+    /// 폴백 함수는 이더 입금을 허용합니다.
     receive() external payable {
         if (msg.value > 0)
             emit Deposit(msg.sender, msg.value);
     }
 
-    /// @dev 계약 생성자는 초기 소유자와 필요한 확인 수를 설정합니다.
-    /// @param _owners 초기 소유자 목록.
-    /// @param _required 필요한 확인 수.
+    /// 계약 생성자는 초기 소유자와 필요한 확인 수를 설정합니다.
     constructor(address[] memory _owners, uint _required)
         validRequirement(_owners.length, _required)
     {
@@ -112,12 +101,7 @@ contract MultiSigWallet {
         required = _required;
     }
 
-    /*
-    * 공용 함수
-    */
-
-    /// @dev 새로운 소유자를 추가할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
-    /// @param owner 새로운 소유자의 주소.
+    /// 새로운 소유자를 추가할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
     function addOwner(address owner)
         public
         onlyWallet
@@ -130,8 +114,7 @@ contract MultiSigWallet {
         emit OwnerAddition(owner);
     }
 
-    /// @dev 소유자를 제거할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
-    /// @param owner 소유자의 주소.
+    /// 소유자를 제거할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
     function removeOwner(address owner)
         public
         onlyWallet
@@ -150,9 +133,7 @@ contract MultiSigWallet {
         emit OwnerRemoval(owner);
     }
 
-    /// @dev 소유자를 새로운 소유자로 교체할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
-    /// @param owner 교체할 소유자의 주소.
-    /// @param newOwner 새로운 소유자의 주소.
+    /// 소유자를 새로운 소유자로 교체할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
     function replaceOwner(address owner, address newOwner)
         public
         onlyWallet
@@ -170,8 +151,7 @@ contract MultiSigWallet {
         emit OwnerAddition(newOwner);
     }
 
-    /// @dev 필요한 확인 수를 변경할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
-    /// @param _required 필요한 확인 수.
+    /// 필요한 확인 수를 변경할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
     function changeRequirement(uint _required)
         public
         onlyWallet
@@ -181,10 +161,7 @@ contract MultiSigWallet {
         emit RequirementChange(_required);
     }
 
-    /// @dev 소유자가 거래를 제출하고 확인할 수 있습니다.
-    /// @param destination 거래 대상 주소.
-    /// @param value 거래 이더 값.
-    /// @param data 거래 데이터 페이로드.
+    /// 소유자가 거래를 제출하고 확인할 수 있습니다.
     function submitTransaction(address destination, uint value, bytes memory data)
         public
         returns (uint transactionId)
@@ -193,8 +170,7 @@ contract MultiSigWallet {
         confirmTransaction(transactionId);
     }
 
-    /// @dev 소유자가 거래를 확인할 수 있습니다.
-    /// @param transactionId 거래 ID.
+    ///소유자가 거래를 확인할 수 있습니다.
     function confirmTransaction(uint transactionId)
         public
         ownerExists(msg.sender)
@@ -206,8 +182,7 @@ contract MultiSigWallet {
         executeTransaction(transactionId);
     }
 
-    /// @dev 소유자가 거래에 대한 확인을 철회할 수 있습니다.
-    /// @param transactionId 거래 ID.
+    /// 소유자가 거래에 대한 확인을 철회할 수 있습니다.
     function revokeConfirmation(uint transactionId)
         public
         ownerExists(msg.sender)
@@ -218,8 +193,7 @@ contract MultiSigWallet {
         emit Revocation(msg.sender, transactionId);
     }
 
-    /// @dev 누구나 확인된 거래를 실행할 수 있습니다.
-    /// @param transactionId 거래 ID.
+    /// 누구나 확인된 거래를 실행할 수 있습니다.
     function executeTransaction(uint transactionId)
         public
         ownerExists(msg.sender)
@@ -258,9 +232,7 @@ contract MultiSigWallet {
         return result;
     }
 
-    /// @dev 거래의 확인 상태를 반환합니다.
-    /// @param transactionId 거래 ID.
-    /// @return 확인 상태.
+    /// 거래의 확인 상태를 반환합니다.
     function isConfirmed(uint transactionId)
         public
         view
@@ -276,13 +248,7 @@ contract MultiSigWallet {
         return false;
     }
 
-    /*
-    * 내부 함수
-    */
-    /// @dev 거래가 아직 존재하지 않는 경우 거래 매핑에 새로운 거래를 추가합니다.
-    /// @param destination 거래 대상 주소.
-    /// @param value 거래 이더 값.
-    /// @param data 거래 데이터 페이로드.
+    /// 거래가 아직 존재하지 않는 경우 거래 매핑에 새로운 거래를 추가합니다.
     function addTransaction(address destination, uint value, bytes memory data)
         internal
         notNull(destination)
@@ -299,11 +265,8 @@ contract MultiSigWallet {
         emit Submission(transactionId);
     }
 
-    /*
-    * Web3 호출 함수
-    */
-    /// @dev 거래의 확인 수를 반환합니다.
-    /// @param transactionId 거래 ID.
+    /// 거래의 확인 수를 반환합니다.
+
     function getConfirmationCount(uint transactionId)
         public
         view
@@ -314,9 +277,7 @@ contract MultiSigWallet {
                 count += 1;
     }
 
-    /// @dev 필터가 적용된 후 거래의 총 수를 반환합니다.
-    /// @param pending 보류 중인 거래를 포함할지 여부.
-    /// @param executed 실행된 거래를 포함할지 여부.
+    /// 필터가 적용된 후 거래의 총 수를 반환합니다.
     function getTransactionCount(bool pending, bool executed)
         public
         view
@@ -328,8 +289,7 @@ contract MultiSigWallet {
                 count += 1;
     }
 
-    /// @dev 소유자 목록을 반환합니다.
-    /// @return 소유자 주소 목록.
+    /// 소유자 목록을 반환합니다.
     function getOwners()
         public
         view
@@ -338,8 +298,7 @@ contract MultiSigWallet {
         return owners;
     }
 
-    /// @dev 거래를 확인한 소유자 주소 배열을 반환합니다.
-    /// @param transactionId 거래 ID.
+    /// 거래를 확인한 소유자 주소 배열을 반환합니다.
     function getConfirmations(uint transactionId)
         public
         view
@@ -358,11 +317,7 @@ contract MultiSigWallet {
             _confirmations[i] = confirmationsTemp[i];
     }
 
-    /// @dev 정의된 범위 내에서 거래 ID 목록을 반환합니다.
-    /// @param from 거래 배열의 시작 인덱스.
-    /// @param to 거래 배열의 끝 인덱스.
-    /// @param pending 보류 중인 거래를 포함할지 여부.
-    /// @param executed 실행된 거래를 포함할지 여부.
+    /// 정의된 범위 내에서 거래 ID 목록을 반환합니다.
     function getTransactionIds(uint from, uint to, bool pending, bool executed)
         public
         view
