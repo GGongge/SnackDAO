@@ -100,7 +100,7 @@ contract MultiSigWallet {
         required = _required;
     }
 
-    /// 새로운 소유자를 추가할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
+    /// 새로운 소유자를 추가할 수 있습니다. 
     function addOwner(address owner)
         public
         onlyWallet
@@ -113,7 +113,7 @@ contract MultiSigWallet {
         emit OwnerAddition(owner);
     }
 
-    /// 소유자를 제거할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
+    /// 소유자를 제거할 수 있습니다.
     function removeOwner(address owner)
         public
         onlyWallet
@@ -132,7 +132,7 @@ contract MultiSigWallet {
         emit OwnerRemoval(owner);
     }
 
-    /// 소유자를 새로운 소유자로 교체할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
+    /// 소유자를 새로운 소유자로 교체할 수 있습니다.
     function replaceOwner(address owner, address newOwner)
         public
         onlyWallet
@@ -150,7 +150,7 @@ contract MultiSigWallet {
         emit OwnerAddition(newOwner);
     }
 
-    /// 필요한 확인 수를 변경할 수 있습니다. 거래는 지갑에 의해 보내져야 합니다.
+    /// 필요한 확인 수를 변경할 수 있습니다.
     function changeRequirement(uint _required)
         public
         onlyWallet
