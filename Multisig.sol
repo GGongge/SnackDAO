@@ -1,9 +1,8 @@
 pragma solidity ^0.8.13;
 
 contract MultiSigWallet {
-    /*
-    *  이벤트
-    */
+    // 이벤트
+
     event Confirmation(address indexed sender, uint indexed transactionId); // 소유자가 거래를 확인할 때 트리거되는 이벤트.
     event Revocation(address indexed sender, uint indexed transactionId); // 소유자가 확인을 철회할 때 트리거되는 이벤트.
     event Submission(uint indexed transactionId); // 새로운 거래가 제출될 때 트리거되는 이벤트.
